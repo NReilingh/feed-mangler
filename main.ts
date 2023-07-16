@@ -2,7 +2,7 @@ import { Application, Router } from "https://deno.land/x/oak@v11.1.0/mod.ts";
 import { oakCors } from "https://deno.land/x/cors@v1.2.2/mod.ts";
 
 // Lies; truncator is actually very dumb
-const smartTruncator = (function () {
+const smartTruncator = function () {
   let foundItem = false;
   return new TransformStream({
     transform (chunk, controller) {
@@ -29,7 +29,7 @@ const smartTruncator = (function () {
       `);
     }
   });
-})();
+};
 
 console.log("hello world");
 const router = new Router();
@@ -39,10 +39,8 @@ router
     if (Number(ctx.params.timestamp) < Math.floor(Date.now() / 1000)) {
       ctx.response.redirect(feedSource);
     } else {
-      console.log("Transform started");
-      const res = await fetch(feedSource);
-      ctx.response.body = res.body?.pipeThrough(new TextDecoderStream()).pipeThrough(smartTruncator);
-      console.log("Transform done");
+      const feed = await fetch(feedSource);
+      ctx.response.body = feed.body?.pipeThrough(new TextDecoderStream()).pipeThrough(smartTruncator());
     }
   });
 
