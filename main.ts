@@ -39,8 +39,10 @@ router
     if (Number(ctx.params.timestamp) < Math.floor(Date.now() / 1000)) {
       ctx.response.redirect(feedSource);
     } else {
+      console.log("Transform started");
       const res = await fetch(feedSource);
       ctx.response.body = res.body?.pipeThrough(new TextDecoderStream()).pipeThrough(smartTruncator);
+      console.log("Transform done");
     }
   });
 
